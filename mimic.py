@@ -2,6 +2,7 @@ import sys
 import re
 import threading
 
+from types import FunctionType
 from webob import Request, Response, exc
 
 '''
@@ -43,29 +44,6 @@ def load_controller(string):
     return func
 
 
-class Router(object):
-
-    def __init__(self):
-        self.routes = []
-
-    def add_route(self, template, controller, **variables):
-        if isinstance(controller, basestring):
-            controller = load_controller(controller)
-        self.routes.append((re.compile(template_to_regex(template)),
-                            controller,
-                            variables))
-
-    def __call__(self, environ, start_response):
-        req = Request(environ)
-        for regex, controller, variables in self.routes:
-            match = regex.match(req.path_info)
-            if match:
-                req.urlvars = match.groupdict()
-                req.urlvars.update(variables)
-                return controller(environ, start_response)
-        return exc.HTTPNotFound()(environ, start_response)
-
-
 def function_controller(func):
     def replacement(environ, start_response):
         req = Request(environ)
@@ -100,6 +78,35 @@ def class_controller(cls):
             resp = e
         return resp(environ, start_response)
     return replacement
+
+
+def wsgi_controller(arg):
+    if isinstance(arg, FunctionType):
+        return function_controller(arg)
+    return class_controller(arg)
+
+
+class Router(object):
+
+    def __init__(self):
+        self.routes = []
+
+    def add_route(self, template, controller, **variables):
+        if isinstance(controller, basestring):
+            controller = load_controller(controller)
+        self.routes.append((re.compile(template_to_regex(template)),
+                            controller,
+                            variables))
+
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        for regex, controller, variables in self.routes:
+            match = regex.match(req.path_info)
+            if match:
+                req.urlvars = match.groupdict()
+                req.urlvars.update(variables)
+                return controller(environ, start_response)
+        return exc.HTTPNotFound()(environ, start_response)
 
 
 class Localized(object):
