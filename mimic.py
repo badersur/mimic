@@ -148,3 +148,9 @@ class RequestHandler(object):
 
     def __init__(self, req):
         self.request = req
+
+def wsgi_application(lst_of_tpls):
+    app = Router()
+    for path, controller in lst_of_tpls:
+        app.add_route(path, controller)
+    return RegisterRequest(app)
