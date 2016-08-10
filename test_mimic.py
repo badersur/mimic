@@ -1,7 +1,7 @@
 import mimic
 
 
-@mimic.controller
+@mimic.function_controller
 def hello(req):
     if req.method == 'POST':
         name = req.params['name']
@@ -13,7 +13,7 @@ def hello(req):
              </form>'''
 
 
-@mimic.rest_controller
+@mimic.class_controller
 class Hello(object):
 
     def __init__(self, req):

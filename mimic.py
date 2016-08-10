@@ -6,10 +6,10 @@ from webob import Request, Response, exc
 
 '''
 Implementing the 'another do it yourself framework' tutorial found at:
-http://docs.webob.org/en/latest/do-it-yourself.html
+http://docs.webob.org/en/latest/do-it-yourself.html with some modifications.
 '''
 
-__version__ = '0.0'
+__version__ = '0.1'
 
 
 var_regex = re.compile(r'''
@@ -48,30 +48,30 @@ class Router(object):
     def __init__(self):
         self.routes = []
 
-    def add_route(self, template, controller, **vars):
+    def add_route(self, template, controller, **variables):
         if isinstance(controller, basestring):
             controller = load_controller(controller)
         self.routes.append((re.compile(template_to_regex(template)),
                             controller,
-                            vars))
+                            variables))
 
     def __call__(self, environ, start_response):
         req = Request(environ)
-        for regex, controller, vars in self.routes:
+        for regex, controller, variables in self.routes:
             match = regex.match(req.path_info)
             if match:
                 req.urlvars = match.groupdict()
-                req.urlvars.update(vars)
+                req.urlvars.update(variables)
                 return controller(environ, start_response)
         return exc.HTTPNotFound()(environ, start_response)
 
 
-def controller(func):
+def function_controller(func):
     def replacement(environ, start_response):
         req = Request(environ)
         try:
             resp = func(req, **req.urlvars)
-        except exc.HTTPException, e:
+        except exc.HTTPException as e:
             resp = e
         if isinstance(resp, basestring):
             resp = Response(body=resp)
@@ -79,7 +79,7 @@ def controller(func):
     return replacement
 
 
-def rest_controller(cls):
+def class_controller(cls):
     def replacement(environ, start_response):
         req = Request(environ)
         try:
@@ -96,7 +96,7 @@ def rest_controller(cls):
             resp = method()
             if isinstance(resp, basestring):
                 resp = Response(body=resp)
-        except exc.HTTPException, e:
+        except exc.HTTPException as e:
             resp = e
         return resp(environ, start_response)
     return replacement
@@ -107,15 +107,15 @@ class Localized(object):
     def __init__(self):
         self.local = threading.local()
 
-    def register(self, object):
-        self.local.object = object
+    def register(self, obj):
+        self.local.obj = obj
 
     def unregister(self):
-        del self.local.object
+        del self.local.obj
 
     def __call__(self):
         try:
-            return self.local.object
+            return self.local.obj
         except AttributeError:
             raise TypeError("No object has been registered for this thread")
 
