@@ -142,3 +142,9 @@ class RegisterRequest(object):
             return self.app(environ, start_response)
         finally:
             get_request.unregister()
+
+
+class RequestHandler(object):
+
+    def __init__(self, req):
+        self.request = req

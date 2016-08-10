@@ -14,10 +14,7 @@ def hello(req):
 
 
 @mimic.wsgi_controller
-class Hello(object):
-
-    def __init__(self, req):
-        self.request = req
+class Hello(mimic.RequestHandler):
 
     def get(self):
         return '''Welcome!
