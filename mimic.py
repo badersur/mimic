@@ -10,8 +10,6 @@ Implementing the 'another do it yourself framework' tutorial found at:
 http://docs.webob.org/en/latest/do-it-yourself.html with some modifications.
 '''
 
-__version__ = '0.1'
-
 
 var_regex = re.compile(r'''
     \{          # The exact character "{"
@@ -147,10 +145,16 @@ class RegisterRequest(object):
 class RequestHandler(object):
 
     def __init__(self, req):
+        req.get = self.get_param
         self.request = req
 
-def wsgi_application(lst_of_tpls):
+    def get_param(self, param_name, default=''):
+        param = self.request.params.get(param_name)
+        return param if param else default
+
+
+def wsgi_application(list_of_tuples):
     app = Router()
-    for path, controller in lst_of_tpls:
+    for path, controller in list_of_tuples:
         app.add_route(path, controller)
     return RegisterRequest(app)

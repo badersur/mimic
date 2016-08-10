@@ -17,14 +17,15 @@ def hello(req):
 class Hello(mimic.RequestHandler):
 
     def get(self):
-        return '''Welcome!
+        user = self.request.get('user', 'visitor')
+        return '''Welcome %s!
             <form method="POST">
             Your name: <input type="text" name="name">
             <input type="submit">
-            </form>'''
+            </form>''' % user
 
     def post(self):
-        name = self.request.params['name']
+        name = self.request.get('name')
         return 'Hello %s!' % name
 
 
