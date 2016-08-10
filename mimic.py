@@ -1,14 +1,21 @@
+'''
+Implementing the 'another do it yourself framework' tutorial found at:
+http://docs.webob.org/en/latest/do-it-yourself.html with some modifications.
+'''
+
 import sys
 import re
 import threading
 
 from types import FunctionType
-from webob import Request, Response, exc
+from webob import Response, exc, Request as webRequest
 
-'''
-Implementing the 'another do it yourself framework' tutorial found at:
-http://docs.webob.org/en/latest/do-it-yourself.html with some modifications.
-'''
+
+class Request(webRequest):
+
+    def get(self, param_name, default=''):
+        param = self.params.get(param_name)
+        return param if param else default
 
 
 var_regex = re.compile(r'''
@@ -145,12 +152,7 @@ class RegisterRequest(object):
 class RequestHandler(object):
 
     def __init__(self, req):
-        req.get = self.get_param
         self.request = req
-
-    def get_param(self, param_name, default=''):
-        param = self.request.params.get(param_name)
-        return param if param else default
 
 
 def wsgi_application(list_of_tuples):

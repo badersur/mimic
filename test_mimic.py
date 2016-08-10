@@ -3,7 +3,7 @@ import mimic
 
 def hello(req):
     if req.method == 'POST':
-        name = req.params['name']
+        name = req.get('name')
         return 'Hello, %s!' % name
     elif req.method == 'GET':
         return '''<form method="POST">
@@ -31,6 +31,7 @@ app = mimic.wsgi_application([
     ('/', hello),
     ('/hello', Hello),
 ])
+
 
 if __name__ == '__main__':
     from paste import httpserver
