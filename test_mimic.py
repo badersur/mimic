@@ -1,7 +1,6 @@
 import mimic
 
 
-@mimic.wsgi_controller
 def hello(req):
     if req.method == 'POST':
         name = req.params['name']
@@ -13,7 +12,6 @@ def hello(req):
              </form>'''
 
 
-@mimic.wsgi_controller
 class Hello(mimic.RequestHandler):
 
     def get(self):

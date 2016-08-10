@@ -156,5 +156,6 @@ class RequestHandler(object):
 def wsgi_application(list_of_tuples):
     app = Router()
     for path, controller in list_of_tuples:
+        controller = wsgi_controller(controller)
         app.add_route(path, controller)
     return RegisterRequest(app)
