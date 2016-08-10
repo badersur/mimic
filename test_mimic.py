@@ -4,19 +4,20 @@ import mimic
 def hello(req):
     if req.method == 'POST':
         name = req.get('name')
-        return 'Hello, %s!' % name
+        return 'Hello %s, from hello method!' % name
     elif req.method == 'GET':
-        return '''<form method="POST">
-             Your name: <input type="text" name="name">
-             <input type="submit">
-             </form>'''
+        return '''hello method!
+            <form method="POST">
+            What's your name? <input type="text" name="name">
+            <input type="submit">
+            </form>'''
 
 
 class Hello(mimic.RequestHandler):
 
     def get(self):
         user = self.request.get('user', 'visitor')
-        return '''Welcome %s!
+        return '''Welcome %s, from Hello class!
             <form method="POST">
             Your name: <input type="text" name="name">
             <input type="submit">
@@ -30,6 +31,7 @@ class Hello(mimic.RequestHandler):
 app = mimic.wsgi_application([
     ('/', hello),
     ('/hello', Hello),
+    ('(?i)/reGeX', Hello),
 ])
 
 
